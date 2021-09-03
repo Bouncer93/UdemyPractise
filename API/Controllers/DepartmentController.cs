@@ -33,13 +33,25 @@ namespace API.Controllers
         [HttpPut("{code}")]
         public async Task<IActionResult> PutDepartment(string code,Department department)
         {
-            return Ok(await _departmentService.Update(code,department));
+            var result = await _departmentService.Update(code,department);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
         [HttpDelete("{code}")]
         public async Task<IActionResult> DeleteDepartment(string code)
         {
-            return Ok( await _departmentService.Delete(code));
+            var result = await _departmentService.Delete(code);
+
+            if(result==null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
         [HttpPost]

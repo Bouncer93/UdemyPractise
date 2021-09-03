@@ -1,9 +1,10 @@
 ﻿
 using DLL.Models;
-using DLL.Repository;
+using BLL.Services;
 using Microsoft.AspNetCore.Mvc;
 
 using System.Threading.Tasks;
+using BLL.Request;
 
 namespace API.Controllers
 {
@@ -42,7 +43,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> PostDepartment(Student student)
+        public async Task<ActionResult> PostDepartment(StudentInsertRequestViewModel student)
         {
             return Ok(await _studentService.InsertAsync( student));
         }
