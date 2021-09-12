@@ -10,6 +10,7 @@ namespace DLL.Repository
     {
         IDepartmentRepository DepartmentRepository { get; }
         IStudentRepository StudentRepository { get; }
+        ICourseRepository CourseRepository { get; }
         Task<bool> SaveCompletedAsync();
     }
     public class UnitOfWork : IUnitOfWork, IDisposable
@@ -23,9 +24,12 @@ namespace DLL.Repository
 
         private IDepartmentRepository _departmentRepository;
         private IStudentRepository _studentRepository;
+        private ICourseRepository _courseRepository;
         public IDepartmentRepository DepartmentRepository => _departmentRepository ??= new DepartmentRepository(_context);
 
         public IStudentRepository StudentRepository => _studentRepository ??= new StudentRepository(_context);
+        public ICourseRepository CourseRepository => _courseRepository ??= new CourseRepository(_context);
+
 
         public void Dispose()
         {

@@ -78,6 +78,19 @@ namespace DLL.DBContext
                     modelBuilder.Entity(entity.ClrType).HasQueryFilter(GetIsDeletedRestriction(entity.ClrType));
                 }
             }
+
+            modelBuilder.Entity<CourseStudent>()
+       .HasKey(bc => new { bc.CourseId ,bc.StudentId });
+            modelBuilder.Entity<CourseStudent>()
+                .HasOne(bc => bc.Student)
+                .WithMany(b => b.CourseStudents)
+                .HasForeignKey(bc => bc.StudentId);
+            modelBuilder.Entity<CourseStudent>()
+                .HasOne(bc => bc.Course)
+                .WithMany(c => c.CourseStudents)
+                .HasForeignKey(bc => bc.CourseId);
+
+
             base.OnModelCreating(modelBuilder);
 
         }
