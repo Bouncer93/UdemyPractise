@@ -23,6 +23,8 @@ namespace DLL.DBContext
 
         public DbSet<Student> Students { get; set; }
         public DbSet<Department> Departments { get; set; }
+        public DbSet<Course> Courses { get; set; }
+        public DbSet<CourseStudent> CourseStudents { get; set; }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {

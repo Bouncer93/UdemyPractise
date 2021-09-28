@@ -15,6 +15,8 @@ namespace BLL
             services.AddTransient<IDepartmentService, DepartmentService>();
             services.AddTransient<IStudentService, StudentService>();
             services.AddTransient<ICourseService, CourseService>();
+            services.AddTransient<ICourseStudentService, CourseStudentService>();
+            services.AddTransient<ITestService, TestService>();
 
             AllFluentValidationDependancy(services);
         }
@@ -24,6 +26,7 @@ namespace BLL
             services.AddTransient<IValidator<DepartmentInsertRequestViewModel>, DepatmentValidator>();
             services.AddTransient<IValidator<StudentInsertRequestViewModel>, StudentInsertRequestViewModelValidator>();
             services.AddTransient<IValidator<CourseInsertRequestViewModel>, CourseInsertRequestViewModelValidator>();
+            services.AddTransient<IValidator<CourseAssignRequestViewModel>, CourseAssignRequestViewModelValidator>();
         }
     }
 }

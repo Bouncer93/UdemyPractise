@@ -3,6 +3,7 @@ using DLL.Models;
 using DLL.Repository;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Utilities.Exceptions;
@@ -12,7 +13,7 @@ namespace BLL.Services
    public interface IDepartmentService
     {
         Task<Department> Insert(DepartmentInsertRequestViewModel request);
-        Task<List<Department>> GetAll();
+        IQueryable<Department> GetAll();
         Task<Department> Read(string code);
         Task<Department> Update(string code, Department department);
         Task<Department> Delete(string code);
@@ -63,9 +64,9 @@ namespace BLL.Services
 
         }
 
-        public async Task<List<Department>> GetAll()
+        public IQueryable<Department> GetAll()
         {
-            return await _unitOfWork.DepartmentRepository.GetList();
+            return  _unitOfWork.DepartmentRepository.QueryAll();
 
         }
 

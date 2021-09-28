@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using System.Threading.Tasks;
 using BLL.Request;
+using LightQuery;
 
 namespace API.Controllers
 {
@@ -21,9 +22,10 @@ namespace API.Controllers
             _studentService = studentService;
         }
         [HttpGet]
-        public async Task< ActionResult> GetAllStudent()
+        [LightQuery(forcePagination: true, defaultPageSize: 10, defaultSort: "studentId desc")]
+        public ActionResult GetAllStudent()
         {
-            return Ok( await _studentService.GetAllStudentsAsync());
+            return Ok(  _studentService.GetAllStudentsAsync());
         }
         [HttpGet("{email}")]
         public  async Task<ActionResult> GetAStudent(string email)

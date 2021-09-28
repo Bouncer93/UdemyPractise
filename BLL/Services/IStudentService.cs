@@ -3,6 +3,7 @@ using DLL.Models;
 using DLL.Repository;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Utilities.Exceptions;
@@ -15,8 +16,10 @@ namespace BLL.Services
         Task<Student> DeletetAsync(string email);
         Task<Student> UpdateAsync(string email, Student student);
         Task<Student> GetStudentAsync(string email);
-        Task<List<Student>> GetAllStudentsAsync();
+        IQueryable<Student> GetAllStudentsAsync();
         Task<bool> IsEmailExist(string email);
+        Task<bool>  IsIdExist(int  id);
+
     }
 
     public class StudentService : IStudentService
@@ -57,9 +60,9 @@ namespace BLL.Services
 
         }
 
-        public async Task<List<Student>> GetAllStudentsAsync()
+        public IQueryable<Student> GetAllStudentsAsync()
         {
-            return await _unitOfWork.StudentRepository.GetList();
+            return  _unitOfWork.StudentRepository.QueryAll();
         }
 
         public async Task<Student> GetStudentAsync(string email)
@@ -145,6 +148,17 @@ namespace BLL.Services
                 return true;
             }
             return false;
+        }
+
+        public async Task<bool> IsIdExist(int id)
+        {
+            var student = await _unitOfWork.StudentRepository.FindSingleAsync(x => x.StudentId == id);
+            if (student == null)
+            {
+                return true;
+            }
+            return false;
+
         }
 
     }

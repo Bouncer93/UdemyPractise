@@ -3,6 +3,7 @@ using BLL.Request;
 using BLL.Services;
 using DLL.Models;
 using DLL.Repository;
+using LightQuery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -21,9 +22,10 @@ namespace API.Controllers
             _departmentService = departmentService;
         }
        [HttpGet]
-       public async Task< IActionResult> GetAll()
+        [LightQuery(forcePagination: true, defaultPageSize: 10, defaultSort: "departmentId desc")]
+        public  IActionResult GetAll()
         {
-            return Ok(await _departmentService.GetAll());
+            return Ok( _departmentService.GetAll());
         }
         [HttpGet("{code}")]
         public async Task<IActionResult> GetADepartment(string code)
