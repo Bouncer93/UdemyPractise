@@ -12,15 +12,23 @@ namespace API.Controllers
     public class TestController : MainApiController
     {
         private readonly ITestService _testService;
-        public TestController(ITestService testService)
+        private readonly ITransactionService _transactionService;
+
+        public TestController(ITestService testService , ITransactionService transactionService)
         {
             _testService = testService;
+           _transactionService = transactionService;
         }
         [HttpGet]
         public async Task<IActionResult>SeedData()
         {
-            //await _testService.SeedData2();
+            await _transactionService.FinancialTransaction();
+            
             return Ok("hello world");
         }
+
+       
+
+        
     }
 }

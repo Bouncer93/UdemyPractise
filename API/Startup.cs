@@ -13,6 +13,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using System;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Identity;
+using DLL.DBContext;
+using DLL.Models;
 
 namespace API
 {
@@ -60,10 +63,16 @@ namespace API
                 });
             });
 
+            IdentitySetup(services);
             
             DLLDepdancy.AllDepadancies(services, Configuration);
             BLLDepandacy.AllDepadancies(services, Configuration);
 
+        }
+
+        private void IdentitySetup(IServiceCollection services)
+        {
+            services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<ApplicationDbContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

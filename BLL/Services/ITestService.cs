@@ -2,6 +2,7 @@
 using DLL.DBContext;
 using DLL.Models;
 using DLL.Repository;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,18 +16,76 @@ namespace BLL.Services
     {
         Task  SeedData();
         Task SeedData2();
+        Task AddNewRoles();
+        Task AddNewUsers();
     }
     public class TestService : ITestService
     {
 
         private readonly IUnitOfWork _unitOfWork;
         private readonly ApplicationDbContext _context;
+        private readonly RoleManager<AppRole> _roleManager;
+        private readonly UserManager<AppUser> _userManager;
 
-        public TestService(IUnitOfWork unitOfWork, ApplicationDbContext context)
+        public TestService(IUnitOfWork unitOfWork, ApplicationDbContext context,RoleManager<AppRole> roleManager,UserManager<AppUser> userManager)
         {
             _context = context;
+            _roleManager = roleManager;
+            _userManager = userManager;
             _unitOfWork = unitOfWork;
         }
+
+        public async Task AddNewRoles()
+        {
+            var roleList = new List<string>();
+            roleList.Add("admin");
+            roleList.Add("manager");
+            roleList.Add("supervisor");
+
+            foreach (var role in roleList)
+            {
+                var exists = await _roleManager.FindByNameAsync(role);
+                if (exists == null)
+                {
+                    await _roleManager.CreateAsync(new AppRole() { Name = role });
+                }
+            }
+
+        }
+
+        public async Task AddNewUsers()
+        {
+            var userList = new List<AppUser>()
+            { 
+             new AppUser()
+             {
+                 UserName= "muazzzidev@gmail.com",
+                 Email = "muazzzidev@gmail.com",
+                 FullName = "Muazzi abdool"
+             },
+             new AppUser()
+             {
+                 UserName= "sumss@gmail.com",
+                 Email = "sumss@gmail.com",
+                   FullName = "Sumi abdool"
+             }
+
+            };
+
+            foreach (var user in userList)
+            {
+                var userexist = await  _userManager.FindByEmailAsync(user.Email);
+                if (userexist == null)
+                {
+                    var inserteddata = await _userManager.CreateAsync(user, "abc123$..A!");
+                    if (inserteddata.Succeeded)
+                    {
+                       await _userManager.AddToRoleAsync(user, "admin");
+                    }
+                }
+            }
+        }
+
         public  async Task SeedData()
         {
             

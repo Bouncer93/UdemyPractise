@@ -8,11 +8,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using DLL.Models;
 using DLL.Models.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace DLL.DBContext
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<AppUser,AppRole,int,IdentityUserClaim<int>,AppUserRole,IdentityUserLogin<int>,IdentityRoleClaim<int>,IdentityUserToken<int>>
     {
 
         private const string IsDeletedProperty = "IsDeleted";
@@ -25,6 +27,8 @@ namespace DLL.DBContext
         public DbSet<Department> Departments { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<CourseStudent> CourseStudents { get; set; }
+        public DbSet<CustomerBalance> CustomerBalances { get; set; }
+        public DbSet<TransactionHistory> TransactionHistories { get; set; }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
@@ -72,6 +76,8 @@ namespace DLL.DBContext
 
         protected override  void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<CustomerBalance>().Property(p => p.RowVersion).IsConcurrencyToken();
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {
                 if (typeof(ISoftDeletable).IsAssignableFrom(entity.ClrType)==true)
@@ -92,6 +98,25 @@ namespace DLL.DBContext
                 .WithMany(c => c.CourseStudents)
                 .HasForeignKey(bc => bc.CourseId);
 
+            
+
+            modelBuilder.Entity<AppUser>
+                (u => 
+            {
+                u.HasMany(e => e.AppUserRoles)
+                .WithOne(e => e.User)
+                .HasForeignKey(ur => ur.RoleId).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                
+                });
+
+            modelBuilder.Entity<AppRole>
+              (u =>
+              {
+                  u.HasMany(e => e.AppUserRoles)
+                    .WithOne(e => e.Role)
+                    .HasForeignKey(ur => ur.RoleId).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                    
+              });
 
             base.OnModelCreating(modelBuilder);
 
