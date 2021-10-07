@@ -1,0 +1,111 @@
+    version: '3.4'
+    #docker run --name myredis -d -p 6379:6379 redis 
+
+    #docker container run --name myelasticsearch -d  -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.14.1
+    #docker container run --name mymongo -d -p 28017:27017 -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=admin123 mongo
+    #docker container run --name mymysql -d -e MYSQL_ROOT_PASSWORD=admin123 -e MYSQL_USER=muaz -e MYSQL_PASSWORD=admin123  percona:8.0
+    #docker container run --name myphpmyadmin -d --link mymysql:db -p 8080:80 -e MYSQL_ROOT_PASSWORD=admin123  phpmyadmin
+    #docker container run --name myrabbit -d -p 15672:15672 -p 5672:5672 -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin123 rabbitmq:3-management
+    #docker run -d --name mykibana -d  --link myelasticsearch:elasticsearch  -p 5601:5601 kibana:7.8.1
+    services:
+      api:
+       image: ${DOCKER_REGISTRY-}api
+       build:
+        context: .
+        dockerfile: API/Dockerfile
+      myredis:
+        image: redis
+        container_name: myredis
+        ports:
+         - 6379:6379
+        restart: always
+        networks:
+         - mytestproject
+    
+
+      myelasticsearch:
+        image: elasticsearch:7.8.1
+        ports: 
+         - 9200:9200
+         - 9300:9300
+        container_name: myelasticsearch
+        environment:
+         - discovery.type=single-node
+        networks:
+         - mytestproject
+      mykibana:
+        ports:
+        - "5601:5601"
+        image: kibana:7.8.1
+        container_name: mykibana
+        links:
+         - myelasticsearch:elasticsearch
+        networks:
+         - mytestproject
+    
+      
+    
+
+      mymongo:
+        image: mongo:latest
+        container_name: mymongo
+        ports: 
+         - 28017:27017
+  
+        environment:
+         MONGO_INITDB_ROOT_USERNAME: admin
+         MONGO_INITDB_ROOT_PASSWORD: admin123
+        networks:
+         - mytestproject
+          
+      mymysql:
+        image:  percona:8.0
+        container_name: mymysql
+        ports: 
+         - 3306:3306
+  
+        environment:
+        - MYSQL_USER=muaz
+        - MYSQL_ROOT_PASSWORD=admin123
+        - MYSQL_PASSWORD=admin123
+        networks:
+         - mytestproject
+      myphpmyadmin:
+        image:  phpmyadmin
+        container_name: myphpmyadmin
+        ports: 
+         - 8081:80
+        links:
+         - mymysql:db
+        environment:
+         - MYSQL_ROOT_PASSWORD=admin123
+        networks:
+         - mytestproject
+    
+      
+      myrabbit:
+        image:  rabbitmq:3-management
+        container_name: myrabbit
+        ports:
+        - 15672:15672
+        - 5672:5672 
+        environment:
+         RABBITMQ_DEFAULT_USER: admin
+         RABBITMQ_DEFAULT_PASS: admin123
+        networks:
+         - mytestproject
+    networks:
+     mytestproject:
+      driver: bridge
+
+      
+         
+        
+     
+         
+        
+     
+
+  
+  
+    

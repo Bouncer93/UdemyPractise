@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DLL", "DLL\DLL.csproj", "{0
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BLL", "BLL\BLL.csproj", "{6316A39C-E657-4E2A-AE50-374B250F64BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilities", "Utilities\Utilities.csproj", "{222B8E04-2282-4F97-B326-FF6F75A6005E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utilities", "Utilities\Utilities.csproj", "{222B8E04-2282-4F97-B326-FF6F75A6005E}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{AAB34360-C9C7-42F9-BBC8-EEFD67C22D5F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{222B8E04-2282-4F97-B326-FF6F75A6005E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{222B8E04-2282-4F97-B326-FF6F75A6005E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{222B8E04-2282-4F97-B326-FF6F75A6005E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAB34360-C9C7-42F9-BBC8-EEFD67C22D5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAB34360-C9C7-42F9-BBC8-EEFD67C22D5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAB34360-C9C7-42F9-BBC8-EEFD67C22D5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAB34360-C9C7-42F9-BBC8-EEFD67C22D5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
