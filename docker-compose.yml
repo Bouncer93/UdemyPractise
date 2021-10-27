@@ -8,6 +8,7 @@
     #docker container run --name myrabbit -d -p 15672:15672 -p 5672:5672 -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin123 rabbitmq:3-management
     #docker run -d --name mykibana -d  --link myelasticsearch:elasticsearch  -p 5601:5601 kibana:7.8.1
     services:
+     
       api:
        image: ${DOCKER_REGISTRY-}api
        build:
@@ -68,6 +69,7 @@
         - MYSQL_USER=muaz
         - MYSQL_ROOT_PASSWORD=admin123
         - MYSQL_PASSWORD=admin123
+        - MYSQL_DATABASE= default_schema
         networks:
          - mytestproject
       myphpmyadmin:
@@ -79,6 +81,8 @@
          - mymysql:db
         environment:
          - MYSQL_ROOT_PASSWORD=admin123
+         - MYSQL_USER=muaz
+         - MYSQL_PASSWORD=admin123
         networks:
          - mytestproject
     
@@ -94,6 +98,33 @@
          RABBITMQ_DEFAULT_PASS: admin123
         networks:
          - mytestproject
+      myminio:
+       container_name: myminio
+       ports:
+        - 9000:9000
+        - 9001:9001
+       image: minio/minio
+       environment:
+       - MINIO_ROOT_USER=AKIAIOSFODNN7EXAMPLE
+       - MINIO_ROOT_PASSWORD=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+       command:
+        server /data --console-address ":9001"
+       networks:
+         - mytestproject
+      mymc:
+       image: minio/mc
+       container_name: mymc
+       network_mode : host
+       entrypoint: >
+         /bin/sh -c "
+                    /usr/bin/mc config host add minio http://127.0.0.1:9000 AKIAIOSFODNN7EXAMPLE wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY;
+                    /usr/bin/mc policy set public minio/udemy-practise;
+                    exit 0;
+                    "
+       
+
+                  
+    
     networks:
      mytestproject:
       driver: bridge

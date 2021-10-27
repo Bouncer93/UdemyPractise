@@ -55,7 +55,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostDepartment(CourseInsertRequestViewModel request)
+        public async Task<IActionResult> PostDepartment([FromForm]CourseInsertRequestViewModel request)
         {
             return Ok(await _courseService.Insert(request));
         }

@@ -1,8 +1,13 @@
 ﻿using BLL.Request;
 using DLL.Models;
 using DLL.Repository;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Minio;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Utilities.Exceptions;
@@ -25,11 +30,21 @@ namespace BLL.Services
     public class CourseService : ICourseService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IConfiguration _configuration;
+        private readonly string _acesskey;
+        private readonly string _secretkey;
+        private readonly string _bucketname;
+        private readonly string _imageserver;
 
-        public CourseService(IUnitOfWork unitOfWork)
+        public CourseService(IUnitOfWork unitOfWork , IConfiguration configuration)
         {
            
             _unitOfWork = unitOfWork;
+            _configuration = configuration;
+            _acesskey = configuration.GetValue<string>("MediaServer:AccessKey");
+            _secretkey = configuration.GetValue<string>("MediaServer:SecretKey");
+            _bucketname = configuration.GetValue<string>("MediaServer:BucketName");
+            _imageserver = configuration.GetValue<string>("MediaServer:ImageServer");
         }
 
         public async Task<Course> Insert(CourseInsertRequestViewModel request)
@@ -38,13 +53,39 @@ namespace BLL.Services
             course.Code = request.Code;
             course.Name = request.Name;
             course.Credit = request.Credit;
+            course.ImageUrl = await ForImageUpload(request.CourseImage);
            
              await _unitOfWork.CourseRepository.CreateAsync(course);
             if(await _unitOfWork.SaveCompletedAsync())
             {
+                course.ImageUrl = _configuration.GetValue<string>("MediaServer:ImageAccessUrl") + course.ImageUrl;
                 return course;
             }
             throw new ApplicationValidationException(message: "Problem occured while inserting course");
+        }
+
+        private async Task<string> ForImageUpload(IFormFile file)
+        {
+            var client = new MinioClient(_imageserver, _acesskey, _secretkey, _bucketname);
+            await SetupBucket(client, _bucketname);
+            var extenstion = Path.GetExtension(file.FileName) ?? ".png";
+            var filename = Guid.NewGuid().ToString() + extenstion;
+            var imagePath = _configuration.GetValue<string>("MediaServer:LocalImageStorage");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), imagePath, filename);
+            await using var bits = new FileStream(path, FileMode.Create);
+            await file.CopyToAsync(bits);
+            bits.Close();
+            await client.PutObjectAsync(bucketName: _bucketname, objectName: filename, path, "image/jpeg");
+            File.Delete(path);
+            return filename;
+        }
+        private static async Task SetupBucket(MinioClient client , string bucketname)
+        {
+            var found = await client.BucketExistsAsync(bucketname);
+            if (!found)
+            {
+                await client.MakeBucketAsync(bucketname);
+            }
         }
 
         public async Task<Course> Delete(string code)
@@ -66,7 +107,14 @@ namespace BLL.Services
 
         public async Task<List<Course>> GetAll()
         {
-            return await _unitOfWork.CourseRepository.GetList();
+            var latest=  await _unitOfWork.CourseRepository.GetList();
+            latest.Select(c =>
+            {
+                c.ImageUrl = _configuration.GetValue<string>("MediaServer:ImageAccessUrl") + c.ImageUrl;
+                return c;
+            }).ToList();
+
+            return latest;
 
         }
 
@@ -121,12 +169,17 @@ namespace BLL.Services
         public async Task<Course> Read(string code)
         {
             var course = await _unitOfWork.CourseRepository.FindSingleAsync(x=>x.Code==code);
+        
             if (course == null)
             {
                 throw new ApplicationValidationException("The course could not be found");
             }
             else
+            {
+                course.ImageUrl = _configuration.GetValue<string>("MediaServer:ImageAccessUrl") + course.ImageUrl;
                 return course;
+            }
+            
 
         }
 
